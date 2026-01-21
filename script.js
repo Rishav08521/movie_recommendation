@@ -7,7 +7,6 @@ const modal = document.getElementById('movieModal');
 const modalDetails = document.getElementById('modalDetails');
 const closeBtn = document.querySelector('.close-modal');
 
-// Fetch movies from API
 async function getMovies(searchTerm) {
     try {
         const res = await fetch(`${BASE_URL}&s=${searchTerm}`);
@@ -15,14 +14,13 @@ async function getMovies(searchTerm) {
         if (data.Response === "True") {
             displayMovies(data.Search);
         } else {
-            movieGrid.innerHTML = `<p style="text-align:center; width:100%;">No movies found for "${searchTerm}"</p>`;
+            movieGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center;">No movies found for "${searchTerm}"</p>`;
         }
     } catch (error) {
-        console.log("Error loading movies");
+        console.log("Error fetching data");
     }
 }
 
-// Display movies in grid
 function displayMovies(movies) {
     movieGrid.innerHTML = '';
     movies.forEach(movie => {
@@ -37,44 +35,42 @@ function displayMovies(movies) {
             </div>
             <div class="movie-info">
                 <h3>${movie.Title}</h3>
-                <p style="color:gray; font-size:0.8rem;">${movie.Year}</p>
+                <p style="color:#777; font-size:0.8rem;">${movie.Year}</p>
             </div>
         `;
         movieGrid.appendChild(card);
     });
 }
 
-// Get specific details for the modal
 async function getMovieDetails(id) {
-    const res = await fetch(`${BASE_URL}&i=${id}&plot=full`);
+    const res = await fetch(`${BASE_URL}&i=${id}`);
     const movie = await res.json();
     modalDetails.innerHTML = `
         <div class="detail-container">
             <img src="${movie.Poster}" class="detail-poster">
             <div class="detail-info">
                 <h2>${movie.Title}</h2>
+                <p><strong>Released:</strong> ${movie.Released}</p>
                 <p><strong>Genre:</strong> ${movie.Genre}</p>
                 <p><strong>Plot:</strong> ${movie.Plot}</p>
-                <p><strong>Rating:</strong> ⭐ ${movie.imdbRating}</p>
+                <p><strong>Actors:</strong> ${movie.Actors}</p>
+                <p style="color:#ffc107;"><strong>IMDb Rating:</strong> ⭐ ${movie.imdbRating}</p>
             </div>
         </div>
     `;
     modal.style.display = "block";
 }
 
-// Modal closing logic
 closeBtn.onclick = () => modal.style.display = "none";
 window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
-// Handle Search
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const val = document.getElementById('movieInput').value;
     if (val) {
         getMovies(val);
-        document.getElementById('sectionTitle').innerText = `Results for: ${val}`;
+        document.getElementById('sectionTitle').innerText = `Search: ${val}`;
     }
 });
 
-// Initial Load
-window.onload = () => getMovies('Batman');
+window.onload = () => getMovies('Action');
